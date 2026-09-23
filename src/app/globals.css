@@ -3,24 +3,21 @@
 /* ---------------------------------------------------------------------------
    VALLEO — design tokens
 
-   Sumi ink on washi paper. The palette is monochrome apart from one accent:
-   蜷色 vermilion, the traditional torii pigment. It appears in a handful of
-   places only — the gate, the active control, a hover state — never as
-   decoration. Themes change tokens; components never hardcode colour.
+   Sumi ink on paper, and nothing else: every value below is black, white or a
+   grey mixed from them. No hue enters the system at any point, including the
+   WebGL gate. Themes change tokens; components never hardcode colour.
    --------------------------------------------------------------------------- */
 
 :root,
 [data-theme="paper"] {
-  --background: #f7f4ef; /* washi */
-  --foreground: #0d0d0d; /* sumi */
-  --muted: #6f6a63;
-  --faint: #b3ada2;
-  --line: #ddd7cb;
-  --surface: #efeae1;
-  --accent: #b7362a; /* 丹色 vermilion */
-  --accent-soft: rgba(183, 54, 42, 0.14);
-  --selection-bg: #0d0d0d;
-  --selection-fg: #f7f4ef;
+  --background: #ffffff;
+  --foreground: #0a0a0a;
+  --muted: #6b6b6b;
+  --faint: #a8a8a8;
+  --line: #dcdcdc;
+  --surface: #f4f4f4;
+  --selection-bg: #0a0a0a;
+  --selection-fg: #ffffff;
 
   --grain-opacity: 0.045;
   --display-weight: 400;
@@ -36,16 +33,14 @@
 }
 
 [data-theme="ink"] {
-  --background: #0c0b0a;
-  --foreground: #f2efe9;
-  --muted: #8f8a82;
-  --faint: #56524c;
-  --line: #262320;
-  --surface: #141210;
-  --accent: #c8452f;
-  --accent-soft: rgba(200, 69, 47, 0.18);
-  --selection-bg: #f2efe9;
-  --selection-fg: #0c0b0a;
+  --background: #0a0a0a;
+  --foreground: #f5f5f5;
+  --muted: #8f8f8f;
+  --faint: #565656;
+  --line: #262626;
+  --surface: #141414;
+  --selection-bg: #f5f5f5;
+  --selection-fg: #0a0a0a;
 
   --grain-opacity: 0.06;
   --display-weight: 400;
@@ -66,8 +61,6 @@
   --faint: #3d3d3d;
   --line: #191919;
   --surface: #050505;
-  --accent: #e0442a;
-  --accent-soft: rgba(224, 68, 42, 0.22);
   --selection-bg: #ffffff;
   --selection-fg: #000000;
 
@@ -84,16 +77,14 @@
 
 /* SHIRO — ultra-minimal light. Looser, quieter, thinner. */
 [data-theme="shiro"] {
-  --background: #fbfaf7;
-  --foreground: #1c1a17;
-  --muted: #8b857c;
-  --faint: #cec8bd;
-  --line: #eae5dc;
+  --background: #fafafa;
+  --foreground: #1c1c1c;
+  --muted: #878787;
+  --faint: #c9c9c9;
+  --line: #ebebeb;
   --surface: #ffffff;
-  --accent: #9e4034;
-  --accent-soft: rgba(158, 64, 52, 0.1);
-  --selection-bg: #1c1a17;
-  --selection-fg: #fbfaf7;
+  --selection-bg: #1c1c1c;
+  --selection-fg: #fafafa;
 
   --grain-opacity: 0.025;
   --display-weight: 300;
@@ -113,7 +104,6 @@
   --color-faint: var(--faint);
   --color-line: var(--line);
   --color-surface: var(--surface);
-  --color-accent: var(--accent);
 
   --font-display: var(--font-display), "Times New Roman", serif;
   --font-sans: var(--font-interface), ui-sans-serif, system-ui, sans-serif;
@@ -153,7 +143,7 @@ body {
 }
 
 :focus-visible {
-  outline: 2px solid var(--accent);
+  outline: 2px solid var(--foreground);
   outline-offset: 3px;
 }
 
@@ -220,13 +210,9 @@ html.lenis body {
   color: var(--muted);
 }
 
-/* --- accent -------------------------------------------------------------- */
+/* --- links --------------------------------------------------------------- */
 
-.accent {
-  color: var(--accent);
-}
-
-/* A hairline that grows from the left on hover, in vermilion. */
+/* A hairline that grows from the left on hover. */
 .link-ink {
   position: relative;
   display: inline-block;
@@ -239,7 +225,7 @@ html.lenis body {
   left: 0;
   width: 100%;
   height: 1px;
-  background: var(--accent);
+  background: var(--foreground);
   transform: scaleX(0);
   transform-origin: left center;
   transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
@@ -252,27 +238,10 @@ html.lenis body {
 
 /* --- brush rules --------------------------------------------------------- */
 
-/* Present by default; the stroke paints itself where scroll-driven
-   animations exist, so nothing depends on JavaScript to become visible. */
+/* Visible by default. GSAP paints it in on scroll where motion is allowed,
+   so a stroke is never invisible just because JavaScript is late. */
 .brush-stroke {
   clip-path: inset(0 0 0 0);
-}
-
-@supports (animation-timeline: view()) {
-  .brush-stroke {
-    animation: brush-draw linear both;
-    animation-timeline: view();
-    animation-range: entry 10% entry 70%;
-  }
-}
-
-@keyframes brush-draw {
-  from {
-    clip-path: inset(0 100% 0 0);
-  }
-  to {
-    clip-path: inset(0 0 0 0);
-  }
 }
 
 /* --- rules --------------------------------------------------------------- */
@@ -320,19 +289,25 @@ html.lenis body {
   100% { transform: translate3d(0, 0, 0); }
 }
 
-/* --- reveal (CSS-driven, no JS needed for the simple cases) -------------- */
+/* --- reveal --------------------------------------------------------------
+   The resting state before GSAP takes over, so nothing flashes in at full
+   opacity first. Without scripting the content is simply shown.
+   ------------------------------------------------------------------------- */
 
 .reveal {
   opacity: 0;
-  transform: translateY(1.5rem);
-  transition:
-    opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1),
-    transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.reveal[data-revealed="true"] {
-  opacity: 1;
-  transform: none;
+@media (scripting: none) {
+  .reveal {
+    opacity: 1;
+  }
+}
+
+/* Words ride inside their own clipping box, so they rise out of the line
+   rather than sliding over the text above. */
+.word-reveal span {
+  vertical-align: top;
 }
 
 /* --- cursor -------------------------------------------------------------- */
@@ -361,12 +336,10 @@ html.lenis body {
   }
 
   .brush-stroke {
-    animation: none;
-    clip-path: inset(0 0 0 0);
+    clip-path: inset(0 0 0 0) !important;
   }
 
   .reveal {
     opacity: 1;
-    transform: none;
   }
 }

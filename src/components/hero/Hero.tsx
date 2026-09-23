@@ -1,8 +1,7 @@
 "use client"
 
-import { useGSAP } from "@gsap/react"
-import { gsap } from "gsap"
 import { useRef } from "react"
+import { gsap, useGSAP } from "@/lib/animation/gsap"
 import { DigitalInk } from "@/components/three/DigitalInk"
 import { BrushRule } from "@/components/ui/BrushRule"
 import { profile } from "@/lib/content/profile"
@@ -59,6 +58,25 @@ export function Hero({ stamp }: { stamp: string }) {
           { opacity: 1, duration: 0.8 },
           "-=0.7",
         )
+
+      // Leaving the hero: the type lifts and thins out, the gate stays behind
+      // and sinks, the scroll cue drops away first. All scrubbed, so the
+      // reader controls the pace.
+      const exit = gsap.timeline({
+        scrollTrigger: {
+          trigger: root.current,
+          start: "top top",
+          end: "bottom top",
+          scrub: 0.6,
+        },
+      })
+
+      exit
+        .to("[data-hero='name']", { yPercent: -38, opacity: 0.12, ease: "none" }, 0)
+        .to("[data-hero='rule']", { xPercent: -14, opacity: 0, ease: "none" }, 0)
+        .to("[data-hero='role']", { yPercent: -120, opacity: 0, ease: "none" }, 0)
+        .to("[data-hero='ink']", { yPercent: 16, scale: 1.14, ease: "none" }, 0)
+        .to("[data-hero='scroll']", { opacity: 0, ease: "none" }, 0)
     },
     { scope: root, dependencies: [reducedMotion] },
   )
@@ -102,7 +120,7 @@ export function Hero({ stamp }: { stamp: string }) {
         </h1>
 
         <div data-hero="rule" className="mt-8 max-w-[46ch]">
-          <BrushRule accent weight="full" />
+          <BrushRule weight="full" />
         </div>
 
         <p
@@ -120,7 +138,7 @@ export function Hero({ stamp }: { stamp: string }) {
         className="relative z-10 flex items-end justify-between opacity-0"
       >
         <p className="type-meta">
-          <span className="accent">—</span> Scroll to enter
+          <span aria-hidden="true">—</span> Scroll to enter
         </p>
         <p className="type-meta hidden max-w-[34ch] text-right sm:block">
           {profile.statement}

@@ -3,6 +3,8 @@ import { Hero } from "@/components/hero/Hero"
 import { Contact } from "@/components/contact/Contact"
 import { WorkIndex } from "@/components/work/WorkIndex"
 import { Reveal } from "@/components/ui/Reveal"
+import { WordReveal } from "@/components/ui/WordReveal"
+import { TechMarquee } from "@/components/skills/TechMarquee"
 import { SectionHeader } from "@/components/ui/SectionHeader"
 import { certifications } from "@/lib/content/certifications"
 import { experience } from "@/lib/content/experience"
@@ -49,14 +51,13 @@ export default function HomePage() {
       >
         <SectionHeader index="02" title="About" aside={profile.locationShort} />
         <div className="mt-16 grid gap-12 md:grid-cols-[1.4fr_1fr]">
-          <Reveal>
-            <h2
-              id="home-about"
-              className="type-display text-[clamp(2rem,6.5vw,5rem)] leading-[0.95] uppercase"
-            >
-              {profile.statement}
-            </h2>
-          </Reveal>
+          <WordReveal
+            as="h2"
+            id="home-about"
+            scrub
+            text={profile.statement}
+            className="type-display text-[clamp(2rem,6.5vw,5rem)] leading-[0.95] uppercase"
+          />
           <Reveal delay={0.1} className="space-y-6">
             <p className="type-body text-muted">{profile.bio[0]}</p>
             <Link
@@ -69,6 +70,8 @@ export default function HomePage() {
           </Reveal>
         </div>
       </section>
+
+      <TechMarquee />
 
       <section
         className="px-[var(--spacing-gutter)] py-[var(--spacing-section)]"

@@ -3,7 +3,8 @@ import { extend, type ThreeElement } from "@react-three/fiber"
 import { Color } from "three"
 
 /**
- * Sumi ink material for the torii.
+ * Sumi ink material for the torii. Strictly two colours — the paper and the
+ * ink — mixed by how wet the stroke is. No hue exists anywhere in the pipeline.
  *
  * Vertex: the beam curve (uCurve lifts the ends of the kasagi) plus a small
  * noise wobble, so no edge is machine-straight.
@@ -22,10 +23,8 @@ export const InkMaterial = shaderMaterial(
     uContrast: 0.9,
     uCurve: 0,
     uDrip: 0,
-    uPaper: new Color("#f7f4ef"),
-    uInk: new Color("#0d0d0d"),
-    uAccent: new Color("#b7362a"),
-    uAccentMix: 0.0,
+    uPaper: new Color("#ffffff"),
+    uInk: new Color("#0a0a0a"),
   },
   /* glsl */ `
     uniform float uTime;
@@ -115,8 +114,6 @@ export const InkMaterial = shaderMaterial(
   /* glsl */ `
     uniform vec3 uPaper;
     uniform vec3 uInk;
-    uniform vec3 uAccent;
-    uniform float uAccentMix;
     uniform float uContrast;
     uniform float uRoughness;
     uniform float uBleed;
@@ -180,7 +177,7 @@ export const InkMaterial = shaderMaterial(
 
       // Wet centre, dry edge: the ink is darkest where the brush pressed.
       float wetness = clamp((density - threshold) * 2.4, 0.0, 1.0);
-      vec3 ink = mix(uInk, uAccent, uAccentMix);
+      vec3 ink = uInk;
       vec3 color = mix(mix(uPaper, ink, 0.55), ink, wetness * uContrast);
 
       // Ink pools and darkens where the stroke meets the paper.

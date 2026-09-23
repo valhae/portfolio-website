@@ -11,7 +11,7 @@ export function Footer() {
 
       <div className="grid gap-8 md:grid-cols-4">
         <div className="flex items-start gap-4">
-          <ToriiMark className="mt-1 h-7 w-7 shrink-0" ink />
+          <ToriiMark className="mt-1 h-7 w-7 shrink-0" />
           <div>
             <p className="type-label">{profile.shortName}</p>
             <p className="type-meta mt-2">{profile.locationShort}</p>

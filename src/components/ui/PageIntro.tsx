@@ -11,13 +11,13 @@ type Props = {
 export function PageIntro({ index, title, lead, meta }: Props) {
   return (
     <header className="pt-36 pb-16 md:pt-44">
-      <p className="type-meta accent">{index}</p>
+      <p className="type-meta">{index}</p>
       <h1 className="type-display mt-4 text-[clamp(3rem,13vw,10rem)] uppercase">
         {title}
       </h1>
 
       <div className="mt-8 max-w-[46ch]">
-        <BrushRule accent weight="full" />
+        <BrushRule weight="full" />
       </div>
 
       <div className="mt-8 grid gap-6 md:grid-cols-[1.4fr_1fr]">

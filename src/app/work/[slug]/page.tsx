@@ -1,6 +1,7 @@
 import Image from "next/image"
 import Link from "next/link"
 import { notFound } from "next/navigation"
+import { Parallax } from "@/components/ui/Parallax"
 import { Reveal } from "@/components/ui/Reveal"
 import { getAdjacentProject, getProject, projects } from "@/lib/content/projects"
 import { pageMetadata } from "@/lib/seo/metadata"
@@ -59,16 +60,18 @@ export default async function ProjectPage({ params }: PageProps<"/work/[slug]">)
       </header>
 
       {project.cover ? (
-        <Reveal className="relative aspect-[16/9] w-full overflow-hidden">
-          <Image
-            src={project.cover}
-            alt={`${project.shortTitle} interface`}
-            fill
-            priority
-            sizes="100vw"
-            className="object-cover grayscale"
-          />
-        </Reveal>
+        <Parallax className="relative aspect-[16/9] w-full" strength={10} zoom>
+          <div className="absolute inset-0">
+            <Image
+              src={project.cover}
+              alt={`${project.shortTitle} interface`}
+              fill
+              priority
+              sizes="100vw"
+              className="object-cover grayscale"
+            />
+          </div>
+        </Parallax>
       ) : null}
 
       <div className="mt-[var(--spacing-section)] grid gap-16 md:grid-cols-[1fr_1.6fr]">
@@ -103,19 +106,22 @@ export default async function ProjectPage({ params }: PageProps<"/work/[slug]">)
           <ul className="mt-10 grid gap-6 md:grid-cols-2">
             {project.gallery.map((image, index) => (
               <li key={image.src}>
-                <Reveal
-                  delay={(index % 2) * 0.06}
-                  className="relative aspect-[16/10] overflow-hidden"
+                <Parallax
+                  className="relative aspect-[16/10]"
+                  strength={index % 2 === 0 ? 8 : 14}
+                  zoom
                 >
-                  <Image
-                    src={image.src}
-                    alt={image.alt}
-                    fill
-                    loading="lazy"
-                    sizes="(max-width: 768px) 100vw, 50vw"
-                    className="object-cover grayscale"
-                  />
-                </Reveal>
+                  <div className="absolute inset-0">
+                    <Image
+                      src={image.src}
+                      alt={image.alt}
+                      fill
+                      loading="lazy"
+                      sizes="(max-width: 768px) 100vw, 50vw"
+                      className="object-cover grayscale"
+                    />
+                  </div>
+                </Parallax>
               </li>
             ))}
           </ul>

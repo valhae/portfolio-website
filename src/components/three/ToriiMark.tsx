@@ -5,15 +5,7 @@ import { cn } from "@/lib/utils/cn"
  * WebGL, reduced motion, or the scene scrolled out of view — so the motif is
  * never absent, only quieter.
  */
-export function ToriiMark({
-  className,
-  ink = false,
-}: {
-  className?: string
-  /** Sumi instead of vermilion. For small marks beside headings. */
-  ink?: boolean
-}) {
-  const fill = ink ? "var(--foreground)" : "var(--accent)"
+export function ToriiMark({ className }: { className?: string }) {
 
   return (
     <svg
@@ -22,7 +14,7 @@ export function ToriiMark({
       aria-hidden="true"
       focusable="false"
     >
-      <g filter="url(#ink-torii)" fill={fill}>
+      <g filter="url(#ink-torii)" fill="var(--foreground)">
         {/* kasagi — curved top beam */}
         <path d="M12,50 Q100,38 188,50 L188,61 Q100,50 12,61 Z" />
         {/* shimaki — second beam */}

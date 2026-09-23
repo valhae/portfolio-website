@@ -21,7 +21,7 @@ export function SectionHeader({
     <div className={cn("pb-1", className)}>
       <div className="flex items-baseline justify-between gap-6 pb-4">
         <div className="flex items-baseline gap-4">
-          <span className="type-meta accent">{index}</span>
+          <span className="type-meta">{index}</span>
           <Tag className="type-label text-foreground">{title}</Tag>
         </div>
         {aside ? <div className="type-meta text-right">{aside}</div> : null}

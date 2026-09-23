@@ -13,55 +13,43 @@ type InkProps = {
 }
 
 /**
- * Ink recipe per theme. The gate keeps its vermilion in every mode — that is
- * the one colour in the system. `ink` is the deep shade the wet core mixes
- * toward, deliberately a darkened vermilion rather than the theme foreground:
- * mixing toward a light foreground turns the gate pink on dark backgrounds.
+ * Ink recipe per theme: the paper it sits on and the sumi it is painted with,
+ * both taken straight from the theme tokens. Two values, no hue.
  */
 const themeInk: Record<
   Theme,
   {
     paper: string
     ink: string
-    accent: string
-    accentMix: number
     roughness: number
     contrast: number
     bleed: number
   }
 > = {
   paper: {
-    paper: "#f7f4ef",
-    ink: "#3a120c",
-    accent: "#b7362a",
-    accentMix: 0.78,
+    paper: "#ffffff",
+    ink: "#0a0a0a",
     roughness: 0.18,
     contrast: 0.95,
     bleed: 0.26,
   },
   ink: {
-    paper: "#0c0b0a",
-    ink: "#571a11",
-    accent: "#c8452f",
-    accentMix: 0.74,
+    paper: "#0a0a0a",
+    ink: "#f5f5f5",
     roughness: 0.42,
     contrast: 1.1,
     bleed: 0.34,
   },
   void: {
     paper: "#000000",
-    ink: "#4a1109",
-    accent: "#e0442a",
-    accentMix: 0.86,
+    ink: "#ffffff",
     roughness: 0.6,
     contrast: 1.3,
     bleed: 0.44,
   },
   shiro: {
-    paper: "#fbfaf7",
-    ink: "#4a1b14",
-    accent: "#9e4034",
-    accentMix: 0.62,
+    paper: "#fafafa",
+    ink: "#1c1c1c",
     roughness: 0.08,
     contrast: 0.72,
     bleed: 0.18,
@@ -114,9 +102,8 @@ function Torii({ theme, quality, scrollVelocity }: InkProps) {
     () => ({
       paper: new Color(recipe.paper),
       ink: new Color(recipe.ink),
-      accent: new Color(recipe.accent),
     }),
-    [recipe.paper, recipe.ink, recipe.accent],
+    [recipe.paper, recipe.ink],
   )
 
   useFrame((state, delta) => {
@@ -142,10 +129,8 @@ function Torii({ theme, quality, scrollVelocity }: InkProps) {
       uniforms.uBleed.value = recipe.bleed
       uniforms.uRoughness.value = recipe.roughness
       uniforms.uContrast.value = recipe.contrast
-      uniforms.uAccentMix.value = recipe.accentMix
       uniforms.uPaper.value = colors.paper
       uniforms.uInk.value = colors.ink
-      uniforms.uAccent.value = colors.accent
     }
 
     if (group.current) {

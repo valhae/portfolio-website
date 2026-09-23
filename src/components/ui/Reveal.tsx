@@ -1,45 +1,56 @@
 "use client"
 
-import { useEffect, useRef, type ReactNode } from "react"
+import { useRef, type ReactNode } from "react"
+import { gsap, useGSAP } from "@/lib/animation/gsap"
+import { duration } from "@/lib/animation/tokens"
+import { usePrefersReducedMotion } from "@/lib/animation/usePrefersReducedMotion"
 import { cn } from "@/lib/utils/cn"
 
 type Props = {
   children: ReactNode
   className?: string
   delay?: number
+  /** Animate direct children in sequence instead of the block as a whole. */
+  stagger?: boolean
 }
 
-/**
- * Scroll reveal with an IntersectionObserver and a CSS transition.
- * No animation library is needed for a fade-and-rise, so none is loaded.
- */
-export function Reveal({ children, className, delay = 0 }: Props) {
+/** Mask-and-rise on entry, driven by ScrollTrigger. */
+export function Reveal({ children, className, delay = 0, stagger }: Props) {
   const ref = useRef<HTMLDivElement>(null)
+  const reducedMotion = usePrefersReducedMotion()
 
-  useEffect(() => {
-    const node = ref.current
-    if (!node) return
+  useGSAP(
+    () => {
+      const node = ref.current
+      if (!node) return
 
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          node.dataset.revealed = "true"
-          observer.disconnect()
-        }
-      },
-      { rootMargin: "0px 0px -12% 0px", threshold: 0.08 },
-    )
+      const targets = stagger ? Array.from(node.children) : node
 
-    observer.observe(node)
-    return () => observer.disconnect()
-  }, [])
+      if (reducedMotion) {
+        gsap.set(targets, { opacity: 1, y: 0, clipPath: "inset(0 0 0% 0)" })
+        return
+      }
+
+      gsap.fromTo(
+        targets,
+        { opacity: 0, y: 40, clipPath: "inset(0 0 12% 0)" },
+        {
+          opacity: 1,
+          y: 0,
+          clipPath: "inset(0 0 0% 0)",
+          duration: duration.cinematic,
+          ease: "expo.out",
+          delay,
+          stagger: stagger ? 0.09 : 0,
+          scrollTrigger: { trigger: node, start: "top 88%" },
+        },
+      )
+    },
+    { scope: ref, dependencies: [reducedMotion, delay, stagger] },
+  )
 
   return (
-    <div
-      ref={ref}
-      className={cn("reveal", className)}
-      style={{ transitionDelay: `${delay}s` }}
-    >
+    <div ref={ref} className={cn("reveal", className)}>
       {children}
     </div>
   )

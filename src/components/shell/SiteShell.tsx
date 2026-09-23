@@ -7,6 +7,7 @@ import { ThemeProvider } from "@/components/theme/ThemeProvider"
 import { Grain } from "@/components/texture/Grain"
 import { InkFilters } from "@/components/ui/InkFilters"
 import { Footer } from "./Footer"
+import { ScrollProgress } from "./ScrollProgress"
 import { SmoothScroll } from "./SmoothScroll"
 
 export function SiteShell({ children }: { children: ReactNode }) {
@@ -14,6 +15,7 @@ export function SiteShell({ children }: { children: ReactNode }) {
     <ThemeProvider>
       <SmoothScroll />
       <InkFilters />
+      <ScrollProgress />
       <Grain />
       <Cursor />
       <a

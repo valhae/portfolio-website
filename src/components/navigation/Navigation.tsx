@@ -2,7 +2,9 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { useState } from "react"
+import { useRef, useState } from "react"
+import { gsap, ScrollTrigger, useGSAP } from "@/lib/animation/gsap"
+import { usePrefersReducedMotion } from "@/lib/animation/usePrefersReducedMotion"
 import { navigation } from "@/lib/content/navigation"
 import { profile } from "@/lib/content/profile"
 import { cn } from "@/lib/utils/cn"
@@ -11,6 +13,8 @@ import { MenuOverlay } from "./MenuOverlay"
 
 export function Navigation() {
   const pathname = usePathname()
+  const header = useRef<HTMLElement>(null)
+  const reducedMotion = usePrefersReducedMotion()
   const [open, setOpen] = useState(false)
   const [lastPath, setLastPath] = useState(pathname)
 
@@ -21,9 +25,37 @@ export function Navigation() {
     setOpen(false)
   }
 
+  // Display type is large enough to run into the header as it passes, and the
+  // header composites in difference blending, so the collision is unreadable.
+  // Scrolling down retracts it; scrolling up, or reaching the top, returns it.
+  useGSAP(
+    () => {
+      const node = header.current
+      if (!node || reducedMotion || open) return
+
+      const trigger = ScrollTrigger.create({
+        start: "top -80",
+        end: "max",
+        onUpdate: (self) => {
+          const hide = self.direction === 1 && self.scroll() > 200
+          gsap.to(node, {
+            yPercent: hide ? -110 : 0,
+            duration: 0.5,
+            ease: "power3.out",
+            overwrite: true,
+          })
+        },
+        onLeaveBack: () => gsap.to(node, { yPercent: 0, duration: 0.4 }),
+      })
+
+      return () => trigger.kill()
+    },
+    { dependencies: [reducedMotion, open] },
+  )
+
   return (
     <>
-      <header className="fixed inset-x-0 top-0 z-[66] mix-blend-difference">
+      <header ref={header} className="fixed inset-x-0 top-0 z-[66] mix-blend-difference">
         <div className="flex items-center justify-between gap-6 px-[var(--spacing-gutter)] py-5 text-white">
           <Link href="/" className="type-label" aria-label="Home">
             {profile.shortName}

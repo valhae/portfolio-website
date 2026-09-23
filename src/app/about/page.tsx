@@ -3,6 +3,7 @@ import { PageIntro } from "@/components/ui/PageIntro"
 import { Reveal } from "@/components/ui/Reveal"
 import { SectionHeader } from "@/components/ui/SectionHeader"
 import { SkillIndex } from "@/components/skills/SkillIndex"
+import { TechMarquee } from "@/components/skills/TechMarquee"
 import { profile } from "@/lib/content/profile"
 import { pageMetadata } from "@/lib/seo/metadata"
 import { breadcrumbSchema } from "@/lib/seo/schema"
@@ -68,6 +69,10 @@ export default function AboutPage() {
         </h2>
         <SkillIndex />
       </section>
+
+      <div className="mt-[var(--spacing-section)]">
+        <TechMarquee />
+      </div>
 
       <section className="mt-[var(--spacing-section)]" aria-labelledby="about-next">
         <h2 id="about-next" className="type-meta">

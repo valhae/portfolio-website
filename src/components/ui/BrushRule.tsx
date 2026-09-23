@@ -1,9 +1,12 @@
+"use client"
+
+import { useRef } from "react"
+import { gsap, useGSAP } from "@/lib/animation/gsap"
+import { usePrefersReducedMotion } from "@/lib/animation/usePrefersReducedMotion"
 import { cn } from "@/lib/utils/cn"
 
 type Props = {
   className?: string
-  /** Vermilion instead of sumi. Reserved for the hero and page openings. */
-  accent?: boolean
   /** Stroke weight. "hair" for section rules, "full" for page openings. */
   weight?: "hair" | "full"
 }
@@ -12,12 +15,40 @@ type Props = {
  * A sumi brush stroke standing in for a horizontal rule: thin at the entry,
  * loaded through the middle, dry at the lift-off. The ragged edge comes from a
  * turbulence filter (see InkFilters) rather than an image, so it costs one
- * element and no request. It draws itself with a scroll-driven animation where
- * the browser supports one, and is simply present where it does not.
+ * element and no request. ScrollTrigger paints it on as it enters the frame,
+ * left to right, the way it would have been brushed.
  */
-export function BrushRule({ className, accent, weight = "hair" }: Props) {
+export function BrushRule({ className, weight = "hair" }: Props) {
+  const ref = useRef<SVGSVGElement>(null)
+  const reducedMotion = usePrefersReducedMotion()
+
+  useGSAP(
+    () => {
+      const node = ref.current
+      if (!node) return
+
+      if (reducedMotion) {
+        gsap.set(node, { clipPath: "inset(0 0% 0 0)" })
+        return
+      }
+
+      gsap.fromTo(
+        node,
+        { clipPath: "inset(0 100% 0 0)" },
+        {
+          clipPath: "inset(0 0% 0 0)",
+          ease: "power2.out",
+          duration: 1.1,
+          scrollTrigger: { trigger: node, start: "top 92%" },
+        },
+      )
+    },
+    { scope: ref, dependencies: [reducedMotion] },
+  )
+
   return (
     <svg
+      ref={ref}
       className={cn("brush-stroke block w-full", className)}
       viewBox="0 0 1200 18"
       preserveAspectRatio="none"
@@ -27,8 +58,8 @@ export function BrushRule({ className, accent, weight = "hair" }: Props) {
     >
       <path
         filter={`url(#ink-${weight})`}
-        fill={accent ? "var(--accent)" : "var(--foreground)"}
-        opacity={accent ? 0.95 : 0.72}
+        fill="var(--foreground)"
+        opacity={weight === "full" ? 0.92 : 0.7}
         d="M3,9.4
            C140,4.2 300,3.1 470,4.8
            C660,6.7 790,11.4 980,8.6
