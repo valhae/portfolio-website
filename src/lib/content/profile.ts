@@ -30,5 +30,48 @@ export const links = [
   { label: "Facebook", href: "https://www.facebook.com/valleooo" },
 ] as const
 
-export const siteUrl =
-  process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ?? "https://valleo.netlify.app"
+const FALLBACK_SITE_URL = "https://valleo.netlify.app"
+
+/**
+ * Absolute origin for canonical URLs, Open Graph, the sitemap and JSON-LD.
+ *
+ * An environment variable that exists but is empty is the common case — a
+ * blank value saved in a hosting dashboard — so presence is not enough to
+ * trust; it has to be checked for content. A bare host without a scheme is
+ * equally common, and `new URL()` rejects it, which fails the production
+ * build rather than the page. Vercel's own deployment URLs are read as a
+ * fallback so a deploy is correct with no configuration at all.
+ */
+function resolveSiteUrl(): string {
+  const candidates = [
+    process.env.NEXT_PUBLIC_SITE_URL,
+    // Set by Vercel: the stable production domain, then this deployment's URL.
+    process.env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL,
+    process.env.VERCEL_PROJECT_PRODUCTION_URL,
+    process.env.VERCEL_URL,
+  ]
+
+  for (const candidate of candidates) {
+    const value = candidate?.trim().replace(/\/+$/, "")
+    if (!value) continue
+
+    const withScheme = /^https?:\/\//i.test(value) ? value : `https://${value}`
+
+    try {
+      const url = new URL(withScheme)
+      // URL() is lenient enough to accept typo'd junk as a hostname, so the
+      // host is checked too: letters, digits, dots and hyphens, and either a
+      // dot or bare localhost.
+      const host = url.hostname
+      const plausible =
+        /^[a-z0-9.-]+$/i.test(host) && (host.includes(".") || host === "localhost")
+      if (plausible) return url.origin
+    } catch {
+      // Malformed value: try the next candidate rather than break the build.
+    }
+  }
+
+  return FALLBACK_SITE_URL
+}
+
+export const siteUrl = resolveSiteUrl()
