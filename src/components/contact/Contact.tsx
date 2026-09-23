@@ -23,7 +23,7 @@ export function Contact() {
         <div>
           <p className="type-meta">Email</p>
           <a
-            className="type-lead mt-2 block break-words underline-offset-8 hover:underline"
+            className="link-ink type-lead mt-2 block break-words"
             href={`mailto:${profile.email}`}
             data-cursor="open"
           >
@@ -54,7 +54,7 @@ export function Contact() {
           {links.map((link) => (
             <li key={link.href}>
               <a
-                className="type-label underline-offset-8 hover:underline"
+                className="link-ink type-label"
                 href={link.href}
                 target="_blank"
                 rel="noreferrer noopener"
@@ -66,7 +66,7 @@ export function Contact() {
           ))}
           <li>
             <a
-              className="type-label underline-offset-8 hover:underline"
+              className="link-ink type-label"
               href={profile.resumeUrl}
               target="_blank"
               rel="noreferrer noopener"

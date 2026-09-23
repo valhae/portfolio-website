@@ -3,35 +3,41 @@ import { extend, type ThreeElement } from "@react-three/fiber"
 import { Color } from "three"
 
 /**
- * Digital Ink material.
+ * Sumi ink material for the torii.
  *
- * Vertex: 3D simplex noise displaces the surface, so the form reads as ink
- * settling rather than a spinning primitive.
- * Fragment: a fresnel term between two monochrome values. No colour ever
- * enters the pipeline, so every theme stays monochrome by construction.
+ * Vertex: the beam curve (uCurve lifts the ends of the kasagi) plus a small
+ * noise wobble, so no edge is machine-straight.
+ * Fragment: ink density from layered noise. Everything below the threshold is
+ * discarded, which gives a ragged, bleeding edge instead of a clean silhouette,
+ * and lets vertical drips run off the underside of each beam. Alpha testing —
+ * not blending — keeps the overlapping parts of the gate sorting correctly.
  */
 export const InkMaterial = shaderMaterial(
   {
     uTime: 0,
     uPointer: [0, 0],
-    uDistortion: 0.32,
+    uBleed: 0.32,
     uVelocity: 0,
     uRoughness: 0.18,
     uContrast: 0.9,
-    uBackground: new Color("#ffffff"),
-    uForeground: new Color("#0a0a0a"),
-    uWire: 0,
+    uCurve: 0,
+    uDrip: 0,
+    uPaper: new Color("#f7f4ef"),
+    uInk: new Color("#0d0d0d"),
+    uAccent: new Color("#b7362a"),
+    uAccentMix: 0.0,
   },
   /* glsl */ `
     uniform float uTime;
     uniform vec2 uPointer;
-    uniform float uDistortion;
+    uniform float uBleed;
     uniform float uVelocity;
-    uniform float uRoughness;
+    uniform float uCurve;
 
     varying vec3 vNormal;
     varying vec3 vPosition;
-    varying float vDisplacement;
+    varying vec3 vLocal;
+    varying float vWobble;
 
     // Ashima / Stefan Gustavson simplex noise (3D), public domain.
     vec3 mod289(vec3 x){return x-floor(x*(1.0/289.0))*289.0;}
@@ -84,41 +90,105 @@ export const InkMaterial = shaderMaterial(
 
     void main() {
       vNormal = normalize(normalMatrix * normal);
+      vLocal = position;
 
-      vec3 pointerField = vec3(uPointer * 0.6, 0.0);
-      float slow = uTime * 0.16;
+      vec3 shaped = position;
 
-      float base = snoise(position * 1.35 + slow);
-      float detail = snoise(position * 3.1 - slow * 1.6 + pointerField) * uRoughness;
-      float velocity = uVelocity * 0.5;
+      // Kasagi sweep: the ends of the top beam lift, the way a real one does.
+      shaped.y += uCurve * pow(abs(position.x), 2.6) * 0.65;
 
-      float displacement = (base + detail) * (uDistortion + velocity);
-      vDisplacement = displacement;
+      float slow = uTime * 0.12;
+      float wobble = snoise(position * 2.1 + slow) * 0.012
+                   + snoise(position * 6.5 - slow * 1.4) * 0.005;
+      wobble *= 1.0 + uBleed * 1.6 + abs(uVelocity) * 1.2;
+      vWobble = wobble;
 
-      vec3 displaced = position + normal * displacement;
-      vPosition = displaced;
+      shaped += normal * wobble;
+      shaped.x += uPointer.x * 0.02 * shaped.y;
 
-      gl_Position = projectionMatrix * modelViewMatrix * vec4(displaced, 1.0);
+      vec4 world = modelViewMatrix * vec4(shaped, 1.0);
+      vPosition = world.xyz;
+
+      gl_Position = projectionMatrix * world;
     }
   `,
   /* glsl */ `
-    uniform vec3 uBackground;
-    uniform vec3 uForeground;
+    uniform vec3 uPaper;
+    uniform vec3 uInk;
+    uniform vec3 uAccent;
+    uniform float uAccentMix;
     uniform float uContrast;
-    uniform float uWire;
+    uniform float uRoughness;
+    uniform float uBleed;
+    uniform float uVelocity;
+    uniform float uDrip;
+    uniform float uTime;
 
     varying vec3 vNormal;
     varying vec3 vPosition;
-    varying float vDisplacement;
+    varying vec3 vLocal;
+    varying float vWobble;
+
+    float hash(vec2 p){
+      return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123);
+    }
+
+    float valueNoise(vec2 p){
+      vec2 i = floor(p);
+      vec2 f = fract(p);
+      vec2 u = f * f * (3.0 - 2.0 * f);
+      return mix(
+        mix(hash(i), hash(i + vec2(1.0, 0.0)), u.x),
+        mix(hash(i + vec2(0.0, 1.0)), hash(i + vec2(1.0, 1.0)), u.x),
+        u.y
+      );
+    }
+
+    float fbm(vec2 p){
+      float total = 0.0;
+      float amplitude = 0.5;
+      for (int i = 0; i < 4; i++) {
+        total += valueNoise(p) * amplitude;
+        p *= 2.02;
+        amplitude *= 0.5;
+      }
+      return total;
+    }
 
     void main() {
       vec3 viewDirection = normalize(-vPosition);
-      float fresnel = pow(1.0 - clamp(dot(viewDirection, normalize(vNormal)), 0.0, 1.0), 2.4);
+      float fresnel = pow(1.0 - clamp(dot(viewDirection, normalize(vNormal)), 0.0, 1.0), 2.2);
 
-      float shade = clamp(fresnel * uContrast + vDisplacement * 0.6 + 0.12, 0.0, 1.0);
-      vec3 color = mix(uBackground, uForeground, shade);
+      // Grain of the brush across the form.
+      float grain = fbm(vLocal.xy * 9.0 + vLocal.z * 2.0);
+      float fibre = fbm(vLocal.xy * vec2(2.0, 34.0));
 
-      gl_FragColor = vec4(color, 1.0 - uWire * 0.45);
+      // Ink runs off the underside of every element, heavier while scrolling.
+      float dripField = fbm(vec2(vLocal.x * 26.0, 0.0));
+      float dripLength = 0.06 + dripField * 0.16 * (abs(uDrip) + abs(uVelocity) * 1.5);
+      float drip = 1.0 - smoothstep(0.35, 0.95, (0.5 + vLocal.y) / max(dripLength, 0.001));
+
+      // Density: solid in the body, thinning and breaking up at the edges.
+      float density = 0.82
+        + grain * 0.35 * uRoughness
+        + fibre * 0.12
+        - fresnel * 0.55 * uBleed
+        + drip * 0.2 * uDrip;
+
+      float threshold = 0.52 + uBleed * 0.18 + abs(uVelocity) * 0.12;
+      if (density < threshold) discard;
+
+      // Wet centre, dry edge: the ink is darkest where the brush pressed.
+      float wetness = clamp((density - threshold) * 2.4, 0.0, 1.0);
+      vec3 ink = mix(uInk, uAccent, uAccentMix);
+      vec3 color = mix(mix(uPaper, ink, 0.55), ink, wetness * uContrast);
+
+      // Ink pools and darkens where the stroke meets the paper.
+      color = mix(color, ink * 0.45, smoothstep(0.55, 1.0, fresnel) * 0.55);
+      // ...and dries out lighter where the brush barely touched.
+      color = mix(color, uPaper, smoothstep(0.1, 0.0, wetness) * 0.3);
+
+      gl_FragColor = vec4(color, 1.0);
       #include <colorspace_fragment>
     }
   `,

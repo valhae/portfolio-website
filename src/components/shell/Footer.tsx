@@ -1,14 +1,21 @@
 import Link from "next/link"
+import { ToriiMark } from "@/components/three/ToriiMark"
+import { BrushRule } from "@/components/ui/BrushRule"
 import { navigation } from "@/lib/content/navigation"
 import { links, profile } from "@/lib/content/profile"
 
 export function Footer() {
   return (
-    <footer className="border-t border-line px-[var(--spacing-gutter)] py-10">
+    <footer className="px-[var(--spacing-gutter)] py-10">
+      <BrushRule className="mb-10" />
+
       <div className="grid gap-8 md:grid-cols-4">
-        <div>
-          <p className="type-label">{profile.shortName}</p>
-          <p className="type-meta mt-2">{profile.locationShort}</p>
+        <div className="flex items-start gap-4">
+          <ToriiMark className="mt-1 h-7 w-7 shrink-0" ink />
+          <div>
+            <p className="type-label">{profile.shortName}</p>
+            <p className="type-meta mt-2">{profile.locationShort}</p>
+          </div>
         </div>
 
         <nav aria-label="Footer">

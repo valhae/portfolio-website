@@ -5,6 +5,7 @@ import { Cursor } from "@/components/cursor/Cursor"
 import { Navigation } from "@/components/navigation/Navigation"
 import { ThemeProvider } from "@/components/theme/ThemeProvider"
 import { Grain } from "@/components/texture/Grain"
+import { InkFilters } from "@/components/ui/InkFilters"
 import { Footer } from "./Footer"
 import { SmoothScroll } from "./SmoothScroll"
 
@@ -12,6 +13,7 @@ export function SiteShell({ children }: { children: ReactNode }) {
   return (
     <ThemeProvider>
       <SmoothScroll />
+      <InkFilters />
       <Grain />
       <Cursor />
       <a

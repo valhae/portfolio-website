@@ -7,6 +7,8 @@ import { useTheme } from "@/components/theme/ThemeProvider"
 import { usePrefersReducedMotion } from "@/lib/animation/usePrefersReducedMotion"
 import { useMediaQuery } from "@/lib/animation/useMediaQuery"
 import { cn } from "@/lib/utils/cn"
+import { InkBoundary } from "./InkBoundary"
+import { ToriiMark } from "./ToriiMark"
 
 // WebGL never blocks first paint, and never ships to users who cannot run it.
 const InkScene = dynamic(() => import("./InkScene"), { ssr: false })
@@ -36,14 +38,7 @@ function InkFallback({ className }: { className?: string }) {
       aria-hidden="true"
       className={cn("pointer-events-none flex items-center justify-center", className)}
     >
-      <div
-        className="aspect-square w-[62%] rounded-full"
-        style={{
-          background:
-            "radial-gradient(circle at 34% 30%, var(--background) 0%, var(--muted) 52%, var(--foreground) 100%)",
-          opacity: 0.85,
-        }}
-      />
+      <ToriiMark className="h-[82%] w-auto opacity-90" />
     </div>
   )
 }
@@ -86,11 +81,13 @@ export function DigitalInk({ className }: { className?: string }) {
   return (
     <div ref={containerRef} className={cn("relative", className)}>
       {canRender ? (
-        <InkScene
-          theme={theme}
-          quality={lowPower ? "reduced" : "full"}
-          scrollVelocity={velocity}
-        />
+        <InkBoundary fallback={<InkFallback className="absolute inset-0" />}>
+          <InkScene
+            theme={theme}
+            quality={lowPower ? "reduced" : "full"}
+            scrollVelocity={velocity}
+          />
+        </InkBoundary>
       ) : (
         <InkFallback className="absolute inset-0" />
       )}

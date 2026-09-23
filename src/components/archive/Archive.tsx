@@ -36,7 +36,7 @@ export function Archive() {
                   </div>
 
                   <a
-                    className="type-label underline-offset-8 hover:underline"
+                    className="link-ink type-label"
                     href={certification.verifyUrl}
                     target="_blank"
                     rel="noreferrer noopener"

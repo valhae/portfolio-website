@@ -2,42 +2,52 @@
 
 /* ---------------------------------------------------------------------------
    VALLEO — design tokens
-   Strict monochrome. Themes change tokens; components never hardcode colour.
+
+   Sumi ink on washi paper. The palette is monochrome apart from one accent:
+   蜷色 vermilion, the traditional torii pigment. It appears in a handful of
+   places only — the gate, the active control, a hover state — never as
+   decoration. Themes change tokens; components never hardcode colour.
    --------------------------------------------------------------------------- */
 
 :root,
 [data-theme="paper"] {
-  --background: #ffffff;
-  --foreground: #0a0a0a;
-  --muted: #6b6b6b;
-  --faint: #a3a3a3;
-  --line: #dcdcdc;
-  --surface: #f4f4f4;
-  --selection-bg: #0a0a0a;
-  --selection-fg: #ffffff;
+  --background: #f7f4ef; /* washi */
+  --foreground: #0d0d0d; /* sumi */
+  --muted: #6f6a63;
+  --faint: #b3ada2;
+  --line: #ddd7cb;
+  --surface: #efeae1;
+  --accent: #b7362a; /* 丹色 vermilion */
+  --accent-soft: rgba(183, 54, 42, 0.14);
+  --selection-bg: #0d0d0d;
+  --selection-fg: #f7f4ef;
 
-  --grain-opacity: 0.035;
+  --grain-opacity: 0.045;
   --display-weight: 400;
   --interface-weight: 400;
   --density: 1;
   --line-visibility: 1;
   --rule-width: 1px;
-  --ink-material: 0.18; /* surface roughness of the Digital Ink object */
+
+  /* Digital Ink: how wet the ink reads, and how far it bleeds. */
+  --ink-material: 0.18;
   --ink-contrast: 0.9;
   --motion-scale: 1;
 }
 
 [data-theme="ink"] {
-  --background: #0a0a0a;
-  --foreground: #f5f5f5;
-  --muted: #8f8f8f;
-  --faint: #5a5a5a;
-  --line: #2a2a2a;
-  --surface: #131313;
-  --selection-bg: #f5f5f5;
-  --selection-fg: #0a0a0a;
+  --background: #0c0b0a;
+  --foreground: #f2efe9;
+  --muted: #8f8a82;
+  --faint: #56524c;
+  --line: #262320;
+  --surface: #141210;
+  --accent: #c8452f;
+  --accent-soft: rgba(200, 69, 47, 0.18);
+  --selection-bg: #f2efe9;
+  --selection-fg: #0c0b0a;
 
-  --grain-opacity: 0.055;
+  --grain-opacity: 0.06;
   --display-weight: 400;
   --interface-weight: 350;
   --density: 1;
@@ -54,12 +64,14 @@
   --foreground: #ffffff;
   --muted: #7d7d7d;
   --faint: #3d3d3d;
-  --line: #1a1a1a;
+  --line: #191919;
   --surface: #050505;
+  --accent: #e0442a;
+  --accent-soft: rgba(224, 68, 42, 0.22);
   --selection-bg: #ffffff;
   --selection-fg: #000000;
 
-  --grain-opacity: 0.08;
+  --grain-opacity: 0.085;
   --display-weight: 400;
   --interface-weight: 500;
   --density: 0.78;
@@ -72,16 +84,18 @@
 
 /* SHIRO — ultra-minimal light. Looser, quieter, thinner. */
 [data-theme="shiro"] {
-  --background: #fafafa;
-  --foreground: #1c1c1c;
-  --muted: #8a8a8a;
-  --faint: #c9c9c9;
-  --line: #ececec;
+  --background: #fbfaf7;
+  --foreground: #1c1a17;
+  --muted: #8b857c;
+  --faint: #cec8bd;
+  --line: #eae5dc;
   --surface: #ffffff;
-  --selection-bg: #1c1c1c;
-  --selection-fg: #fafafa;
+  --accent: #9e4034;
+  --accent-soft: rgba(158, 64, 52, 0.1);
+  --selection-bg: #1c1a17;
+  --selection-fg: #fbfaf7;
 
-  --grain-opacity: 0.02;
+  --grain-opacity: 0.025;
   --display-weight: 300;
   --interface-weight: 300;
   --density: 1.35;
@@ -99,6 +113,7 @@
   --color-faint: var(--faint);
   --color-line: var(--line);
   --color-surface: var(--surface);
+  --color-accent: var(--accent);
 
   --font-display: var(--font-display), "Times New Roman", serif;
   --font-sans: var(--font-interface), ui-sans-serif, system-ui, sans-serif;
@@ -138,7 +153,7 @@ body {
 }
 
 :focus-visible {
-  outline: 2px solid var(--foreground);
+  outline: 2px solid var(--accent);
   outline-offset: 3px;
 }
 
@@ -193,6 +208,71 @@ html.lenis body {
   line-height: 1.18;
   letter-spacing: -0.02em;
   text-wrap: balance;
+}
+
+/* Vertical metadata — a tategaki column, used once per page at most. */
+.type-vertical {
+  font-family: var(--font-mono);
+  font-size: clamp(0.5625rem, 0.65vw, 0.6875rem);
+  letter-spacing: 0.42em;
+  text-transform: uppercase;
+  writing-mode: vertical-rl;
+  color: var(--muted);
+}
+
+/* --- accent -------------------------------------------------------------- */
+
+.accent {
+  color: var(--accent);
+}
+
+/* A hairline that grows from the left on hover, in vermilion. */
+.link-ink {
+  position: relative;
+  display: inline-block;
+}
+
+.link-ink::after {
+  content: "";
+  position: absolute;
+  bottom: -0.35em;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background: var(--accent);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.link-ink:hover::after,
+.link-ink:focus-visible::after {
+  transform: scaleX(1);
+}
+
+/* --- brush rules --------------------------------------------------------- */
+
+/* Present by default; the stroke paints itself where scroll-driven
+   animations exist, so nothing depends on JavaScript to become visible. */
+.brush-stroke {
+  clip-path: inset(0 0 0 0);
+}
+
+@supports (animation-timeline: view()) {
+  .brush-stroke {
+    animation: brush-draw linear both;
+    animation-timeline: view();
+    animation-range: entry 10% entry 70%;
+  }
+}
+
+@keyframes brush-draw {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
 }
 
 /* --- rules --------------------------------------------------------------- */
@@ -278,6 +358,11 @@ html.lenis body {
 
   .grain {
     animation: none;
+  }
+
+  .brush-stroke {
+    animation: none;
+    clip-path: inset(0 0 0 0);
   }
 
   .reveal {

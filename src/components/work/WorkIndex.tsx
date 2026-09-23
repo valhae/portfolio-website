@@ -33,7 +33,7 @@ export function WorkIndex({ limit }: { limit?: number }) {
               onBlur={() => setActive(null)}
               className="group grid grid-cols-[auto_1fr] items-baseline gap-x-6 gap-y-3 border-b border-line py-8 md:grid-cols-[6ch_1fr_auto] md:py-10"
             >
-              <span className="type-meta transition-opacity duration-500 group-hover:opacity-100 md:opacity-60">
+              <span className="type-meta transition-colors duration-500 group-hover:text-[var(--accent)] group-focus-visible:text-[var(--accent)] md:opacity-70 md:group-hover:opacity-100">
                 {project.number}
               </span>
 
