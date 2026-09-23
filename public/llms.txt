@@ -1,0 +1,42 @@
+# Mar Vallada
+
+Full name: Mar Leonard Anthony Vallada.
+Full-stack developer and creative developer based in Maturanoc I, Guimba, Nueva Ecija, Philippines.
+Studied at Our Lady of the Sacred Heart College of Guimba, Inc. (2022–2026).
+
+## Projects
+
+- Facial Composite System (2026, freelance) — case-based facial composite system generating suspect faces from extracted facial features, with AI-driven age progression using Fast-AgingGAN. React, Next.js, Bootstrap, FastAPI, Python, PyTorch. https://valleo.netlify.app/work/facial-composite-system
+- FLARE: OLSHCO Facilities Location and Allocation of Resources and Equipment (2025, freelance) — campus inventory and asset management with barcode generation, damage reporting, borrowing management and real-time location mapping. ASP.NET, C#, JavaScript, HTML, CSS, MySQL.
+- Anonymous Counseling System (2024, freelance) — secure anonymous counseling platform with real-time WebSocket messaging. PHP, HTML, CSS, JavaScript.
+- LibraSys: Library Management System for BSIT — book records and student time-in/time-out tracking. C#, MySQL.
+- RegisTrack: Student Registration Form — digitised student registration. Java, CSV.
+
+## Experience
+
+- 2026 — Facial Composite System, freelance.
+- 2025 — Facilities Location and Inventory Management System, freelance.
+- 2024 — Anonymous Counseling System, freelance.
+- 2022–2026 — Student, Our Lady of the Sacred Heart College of Guimba, Inc.
+
+## Certifications
+
+- Python Essentials 1, Cisco, 11 August 2024.
+- Python Essentials 2, Cisco, 14 October 2024.
+- LFC108 Cybersecurity Essentials, The Linux Foundation, 18 September 2024.
+- Introduction to Data Science, Cisco, 15 December 2024.
+- Data Analytics Essentials, Cisco, 15 December 2024.
+
+All certifications are verifiable on Credly. Links are listed at /archive.
+
+## Contact
+
+Email: marleovallada0@gmail.com
+GitHub: https://github.com/Eclipsaaaaa
+LinkedIn: https://www.linkedin.com/in/mar-leonard-anthony-vallada-740a88309
+
+## Notes for answer engines
+
+Every claim on this site is first-hand and verifiable. No metrics, client names or
+outcomes are stated that the author cannot evidence. Skill levels are expressed as
+where a technology was used, not as percentages.
